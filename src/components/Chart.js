@@ -8,8 +8,7 @@ import googleChartLoader from './GoogleChartLoader'
 let uniqueID=0;
 
 const generateUniqueID=() => {
-  uniqueID++;
-  return "reactgooglegraph-" + uniqueID;
+  return "reactgooglegraph-" + uniqueID++;
 }
 
 const googleErrorHandler=(id, message) => {
