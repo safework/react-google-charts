@@ -28,6 +28,18 @@ export default class Chart extends React.Component {
     this.hidden_columns= {};
     this.dataTable= [];
   }
+
+  handleChartError(e){
+    let { errorHandler } = this.props
+
+    let container = document.getElementById(this.state.graphID)
+    container.innerHTML = ''
+
+    google.visualization.errors.removeError(e.id)
+    this.props.errorHandler.callback(e)
+    google.visualization.errors.addError(container, errorHandler.message || 'Unable to generate graph.', e.message, errorHandler.options)
+  }
+
   componentDidMount(){
     debug('componentDidMount');
     if (this.props.loadCharts) {
@@ -38,8 +50,8 @@ export default class Chart extends React.Component {
     else {
       this.drawChart();
     }
-
   }
+
   componentWillUnmount() {
     try {
       google.visualization.events.removeAllListeners(this.wrapper);
@@ -47,8 +59,8 @@ export default class Chart extends React.Component {
     catch(err) {
       console.error("Error removing events, error : ", err);
     }
-
   }
+
   componentDidUpdate(){
     debug('componentDidUpdate');
     if (!this.props.loadCharts) {
@@ -63,6 +75,7 @@ export default class Chart extends React.Component {
       this.drawChart.bind(this)();
     }
   }
+
   buildDataTableFromProps() {
     debug('buildDataTableFromProps', this.props);
     if (this.props.data === null && this.props.rows.length === 0){
@@ -90,6 +103,7 @@ export default class Chart extends React.Component {
     dataTable.addRows(this.props.rows);
     return dataTable;
   }
+
   updateDataTable() {
     debug("updateDataTable");
     google.visualization.errors.removeAll(document.getElementById(this.wrapper.getContainerId()));
@@ -98,13 +112,16 @@ export default class Chart extends React.Component {
     this.dataTable= this.buildDataTableFromProps.bind(this)();
     return this.dataTable;
   }
+
   //DEPRECATED AND NOT USED
   getDataTableFromProps() {
     debug("getDataTableFromProps");
     return this.props.data !== null ? this.props.data : this.buildDataTableFromProps.bind(this)();
   }
+
   drawChart() {
     debug("drawChart", this);
+    document.getElementById(this.state.graphID).innerHTML = `${this.props.loader || 'Rendering Chart...'}`
     if (!this.wrapper) {
       let chartConfig= {
         chartType: this.props.chartType,
@@ -121,14 +138,13 @@ export default class Chart extends React.Component {
         this.listenToChartEvents.bind(this)();
         this.addChartActions.bind(this)();
       });
-    }
-    else {
+    } else {
       this.updateDataTable.bind(this)();
       this.wrapper.setDataTable(this.dataTable);
       this.wrapper.setChartType(this.props.chartType)
       this.wrapper.setOptions(this.props.options)
-
     }
+    google.visualization.events.addOneTimeListener(this.wrapper, 'error', (e)=>this.handleChartError(e))
     this.wrapper.draw();
   }
 
@@ -142,8 +158,8 @@ export default class Chart extends React.Component {
       text: this.props.chartActions.text,
       action: this.props.chartActions.action.bind(this, this.chart)
     })
-
   }
+
   listenToChartEvents() {
     debug('listenToChartEvents', this.props.legend_toggle, this.props.chartEvents);
     if (this.props.legend_toggle) {
@@ -160,8 +176,9 @@ export default class Chart extends React.Component {
             });
         })(chartEvent);
       }
-      });
+    });
   }
+
   onSelectToggle() {
     debug('onSelectToggle');
     let selection= this.chart.getSelection();
@@ -172,6 +189,7 @@ export default class Chart extends React.Component {
       }
     }
   }
+
   getColumnColor(columnIndex) {
     if (this.props.options.colors) {
       if (this.props.options.colors[columnIndex]) {
@@ -207,6 +225,7 @@ export default class Chart extends React.Component {
       }
     };
   }
+
   addEmptyColumnTo(columns, columnIndex) {
     debug('addEmptyColumnTo', columns, columnIndex);
     let emptyColumn= this.buildEmptyColumnFromSourceData(columnIndex);
@@ -220,14 +239,17 @@ export default class Chart extends React.Component {
     }
     colors.push('#CCCCCC');
   }
+
   addSourceColumnTo(columns, columnIndex) {
     debug('addSourceColumnTo', columns, columnIndex);
     let sourceColumn=this.buildColumnFromSourceData(columnIndex);
     columns.push(sourceColumn);
   }
+
   isHidden(columnIndex) {
     return this.hidden_columns[columnIndex] !== undefined
   }
+
   restoreColorTo(colors, columnIndex) {
     debug('restoreColorTo', colors, columnIndex);
     debug('hidden_columns',this.hidden_columns);
@@ -280,11 +302,13 @@ export default class Chart extends React.Component {
     this.props.options.colors=colors;
     this.chart.draw(view, this.props.options);
   }
+
   render() {
     debug('render', this.props, this.state);
     let divStyle= {height: this.props.height || this.props.options.height, width: this.props.width || this.props.options.width};
-    return <div id={this.state.graphID} style={divStyle}> {this.props.loader ? this.props.loader : 'Rendering Chart...'} </div>
+    return <div id={this.state.graphID} style={divStyle}></div>
   }
+
 };
 
 Chart.defaultProps={
@@ -305,9 +329,17 @@ Chart.defaultProps={
   height: '300px',
   chartEvents : [],
   chartActions : null,
+  errorHandler: {
+    message: 'Unable to generate graph.',
+    options: {
+      style: 'background-color: #324199; font-size: 30px; padding: 10px;',
+      removable: false
+    },
+    callback: ()=>{}
+  },
   data: null,
   onSelect: null,
   legend_toggle: false,
   loadCharts:true,
-  loader: <div>Rendering Chart</div>
+  loader: 'Rendering Chart'
 }
