@@ -2,6 +2,39 @@ const sampleData = [
   {
     chartType: 'BarChart',
     data:[
+      // ['Element', 'Density', { role: 'style' }],
+      // ['Copper', 8.94, '#b87333'],            // RGB value
+      // ['Silver', 10.49, 'silver'],            // English color name
+      // ['Gold', 19.30, 'gold'],
+      // ['Platinum', 21.45, 'color: #e5e4e2' ] // CSS-style declaration
+    ],
+    width: "100%",
+    height: "300px",
+    options: {
+      title: "ERROR!!!",
+      bar: {groupWidth: "95%"},
+      legend: { position: "none" },
+    },
+    chartEvents : [
+      {
+        eventName : 'onmouseover',
+        callback  : (Chart) => {
+          console.log("mouseover the error");
+        }
+      }
+    ],
+    errorHandler: {
+      message: 'Unable to generate graph.',
+      options: {
+        style: 'background-color: #32aaa9; font-size: 30px; padding: 10px;',
+        removable: false
+      },
+      callback: (e)=>console.log(`Error: ${e.id}. Message: ${e.message}`)
+    }
+  },
+  {
+    chartType: 'BarChart',
+    data:[
       ['Element', 'Density', { role: 'style' }],
       ['Copper', 8.94, '#b87333'],            // RGB value
       ['Silver', 10.49, 'silver'],            // English color name
