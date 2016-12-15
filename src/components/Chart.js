@@ -115,7 +115,6 @@ export default class Chart extends React.Component {
 
   drawChart() {
     debug("drawChart", this);
-    document.getElementById(this.state.graphID).innerHTML = `${this.props.loader || 'Rendering Chart...'}`
     if (!this.wrapper) {
       let chartConfig= {
         chartType: this.props.chartType,
@@ -126,18 +125,18 @@ export default class Chart extends React.Component {
       this.dataTable= this.buildDataTableFromProps.bind(this)();
       this.wrapper.setDataTable(this.dataTable)
 
+      google.visualization.events.addOneTimeListener(this.wrapper, 'ready', ()=>{
+        this.chart= this.wrapper.getChart();
+        this.listenToChartEvents.bind(this)();
+        this.addChartActions.bind(this)();
+      });
+
     } else {
       this.updateDataTable.bind(this)();
       this.wrapper.setDataTable(this.dataTable);
       this.wrapper.setChartType(this.props.chartType)
       this.wrapper.setOptions(this.props.options)
     }
-
-    google.visualization.events.addOneTimeListener(this.wrapper, 'ready', ()=>{
-      this.chart= this.wrapper.getChart();
-      this.listenToChartEvents.bind(this)();
-      this.addChartActions.bind(this)();
-    });
 
     google.visualization.events.addOneTimeListener(this.wrapper, 'error', (e)=>this.handleChartError(e))
 
@@ -302,7 +301,7 @@ export default class Chart extends React.Component {
   render() {
     debug('render', this.props, this.state);
     let divStyle= {height: this.props.height || this.props.options.height, width: this.props.width || this.props.options.width};
-    return <div id={this.state.graphID} style={divStyle}></div>
+    return <div id={this.state.graphID} style={divStyle}>{this.props.loader || 'Rendering Chart...'}</div>
   }
 
 };
