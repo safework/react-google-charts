@@ -35,6 +35,11 @@
   "bugs": {
     "url": "https://github.com/rakannimer/react-google-charts/issues"
   },
+  "files": [
+    "README.md",
+    "lib/",
+    "index.js"
+  ],
   "author": "Rakan Nimer",
   "homepage": "https://rakannimer.github.io/react-google-charts/",
   "license": "UNLICENSE",
