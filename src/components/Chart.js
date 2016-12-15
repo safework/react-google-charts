@@ -11,12 +11,6 @@ const generateUniqueID=() => {
   return "reactgooglegraph-" + uniqueID++;
 }
 
-const googleErrorHandler=(id, message) => {
-  console.error("Google Charts encountered an error : ")
-  console.error(`Error ID : ${id}`);
-  console.error(`Error MESSAGE : ${message}`);
-}
-
 export default class Chart extends React.Component {
   constructor(props) {
 
@@ -36,7 +30,7 @@ export default class Chart extends React.Component {
     container.innerHTML = ''
 
     google.visualization.errors.removeError(e.id)
-    this.props.errorHandler.callback(e)
+    errorHandler.callback && errorHandler.callback(e)
     google.visualization.errors.addError(container, errorHandler.message || 'Unable to generate graph.', e.message, errorHandler.options)
   }
 
@@ -132,19 +126,21 @@ export default class Chart extends React.Component {
       this.dataTable= this.buildDataTableFromProps.bind(this)();
       this.wrapper.setDataTable(this.dataTable)
 
-
-      google.visualization.events.addOneTimeListener(this.wrapper, 'ready', ()=>{
-        this.chart= this.wrapper.getChart();
-        this.listenToChartEvents.bind(this)();
-        this.addChartActions.bind(this)();
-      });
     } else {
       this.updateDataTable.bind(this)();
       this.wrapper.setDataTable(this.dataTable);
       this.wrapper.setChartType(this.props.chartType)
       this.wrapper.setOptions(this.props.options)
     }
+
+    google.visualization.events.addOneTimeListener(this.wrapper, 'ready', ()=>{
+      this.chart= this.wrapper.getChart();
+      this.listenToChartEvents.bind(this)();
+      this.addChartActions.bind(this)();
+    });
+
     google.visualization.events.addOneTimeListener(this.wrapper, 'error', (e)=>this.handleChartError(e))
+
     this.wrapper.draw();
   }
 
@@ -332,7 +328,7 @@ Chart.defaultProps={
   errorHandler: {
     message: 'Unable to generate graph.',
     options: {
-      style: 'background-color: #324199; font-size: 30px; padding: 10px;',
+      style: 'background-color: #324199; font-size: 10px; padding: 10px;',
       removable: false
     },
     callback: ()=>{}

@@ -16,7 +16,19 @@ export default class ChartEditor extends React.Component {
     }
     render() {
         return <div>
-            <Chart chartType = {this.state.chart.chartType} width={this.state.chart.width} height={this.state.chart.height} rows = {this.state.chart.rows} columns =  {this.state.chart.columns} data ={this.state.chart.data} options = {this.state.chart.options} legend_toggle = {this.state.chart.legend_toggle} chartEvents = {this.state.chart.chartEvents} chartPackages={['corechart','table','timeline','treemap', 'wordtree','gantt']}  />
+            <Chart
+              chartType={this.state.chart.chartType}
+              width={this.state.chart.width}
+              height={this.state.chart.height}
+              rows={this.state.chart.rows}
+              columns={this.state.chart.columns}
+              data={this.state.chart.data}
+              options={this.state.chart.options}
+              legend_toggle={this.state.chart.legend_toggle}
+              chartEvents={this.state.chart.chartEvents}
+              errorHandler={this.state.chart.errorHandler}
+              chartPackages={['corechart','table','timeline','treemap', 'wordtree','gantt']}
+             />
             <PropsEditor inputValue = {JSON.stringify(this.state.chart)} onSubmit= {this.handleFormSubmit.bind(this)}/>
         </div>
     }
